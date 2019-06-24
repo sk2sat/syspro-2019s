@@ -27,8 +27,8 @@ main(void)
       exit();
     }
     if(pid == 0){
-      exec("sh", argv);
-      printf(1, "init: exec sh failed\n");
+      exec("sksat-sh", argv);
+      printf(1, "init: exec sksat-sh failed\n");
       exit();
     }
     while((wpid=wait()) >= 0 && wpid != pid)
