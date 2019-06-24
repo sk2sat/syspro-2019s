@@ -168,6 +168,7 @@ mkfs: mkfs.c fs.h
 UPROGS=\
 	_cat\
 	_sksat-cat\
+	_sksat-sh\
 	_echo\
 	_forktest\
 	_grep\
