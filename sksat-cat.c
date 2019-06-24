@@ -10,7 +10,9 @@ int main(int argc, char **argv){
 
 	for(;;){
 		snum = read(0, buf, BUF_SIZE);
-		if(snum < 0) break;
+		if(snum < 0 || buf[0]==0) break;
 		write(1, buf, snum);
 	}
+
+	exit();
 }
