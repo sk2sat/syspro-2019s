@@ -11,7 +11,7 @@ apps:
 	make $(APPS)
 
 clean:
-	rm -f *.o *.d *.asm *.sym
+	rm -f _* *.o *.d *.asm *.sym
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
