@@ -1,5 +1,6 @@
 #include "types.h"
 #include "user.h"
+#include "fcntl.h"
 
 #define bool	_Bool
 #define true	1
@@ -20,16 +21,22 @@ typedef struct {
 	int len;
 } String;
 
+typedef struct {
+	char *input, *output;
+} RedirInfo;
+
 char* get_cmdline();
 void run_cmdline(char *cmdline);
 void exec_cmd(char *cmd);
 void exec_pipe(char *cmd, char *rcmd);
 
+char *skip_space(char *p);
+
 int main(int argc, char **argv){
 	while(true){
 		printf(stdout, "> ");
 		char *cmdline = get_cmdline();
-		printf(stdout, "cmdline: %s\n", cmdline);
+		printf(stdout, "cmdline: \"%s\"\n", cmdline);
 
 		run_cmdline(cmdline);
 	}
@@ -44,15 +51,22 @@ char* get_cmdline(){
 
 	if(buf[0] == EOF)
 		exit();
+
+	for(int n=BUF_SIZE-1;;n--){
+		if(buf[n] == '\n'){
+			buf[n] = '\0';
+			break;
+		}
+	}
+
 	return buf;
 }
 
-char* get_rightcmd(char **pcmdline){
-	char *cl = *pcmdline;
-	for(;*cl!='\0';cl++){
-		if(*cl == '|'){
-			*cl = '\0';
-			return cl+1;
+char* get_rightcmd(char *cmdline){
+	for(;*cmdline!='\0';cmdline++){
+		if(*cmdline == '|'){
+			*cmdline = '\0';
+			return skip_space(cmdline+1);
 		}
 	}
 
@@ -60,7 +74,7 @@ char* get_rightcmd(char **pcmdline){
 }
 
 void run_cmdline(char *cmdline){
-	char *rcmdline = get_rightcmd(&cmdline);
+	char *rcmdline = get_rightcmd(cmdline);
 	if(rcmdline != NULL){
 		printf(stdout, "rcmdline: %s\n", rcmdline);
 		exec_pipe(cmdline, rcmdline);
@@ -103,7 +117,6 @@ String* get_arg(char *cmd){
 			break;
 		end++;
 	}
-	*end = '\0';
 
 	if(cmd == end) return NULL;
 
@@ -111,13 +124,37 @@ String* get_arg(char *cmd){
 	arg->len = end - cmd;
 	arg->str = malloc(end-begin+1);
 
+//	printf(stdout, "get_arg: ");
 	for(int n=0;n<arg->len;n++){
-		printf(stdout, "%c ", arg->str[n]);
+		//printf(stdout, "%c", begin[n]);
 		arg->str[n] = begin[n];
 	}
+//	printf(stdout, "\n");
+
 	arg->str[arg->len] = '\0';
 
 	return arg;
+}
+
+RedirInfo* parse_redirect(char *cmd){
+	RedirInfo *info = malloc(sizeof(RedirInfo));
+
+	for(char *p=cmd;*p!='\0';p++){
+		if(*p == '>'){
+			*p = '\0';
+			p = skip_space(p+1);
+//			printf(stdout, "output file: %s\n", p);
+			info->output = p;
+			for(;*p!='\0';p++){
+				if(is_space(*p)){
+					*p = '\0';
+					break;
+				}
+			}
+			break;
+		}
+	}
+	return info;
 }
 
 char** parse_arg(char *cmd){
@@ -138,17 +175,28 @@ char** parse_arg(char *cmd){
 }
 
 void exec_cmd(char *cmd){
+	RedirInfo *rinfo = parse_redirect(cmd);
+//	printf(stdout, "before parse arg: %s\n", cmd);
 	char** argv = parse_arg(cmd);
-	printf(stdout, "argv: %s, %s\n", argv[0], argv[1]);
+
+	if(rinfo->output != NULL){
+		close(stdout);
+		int fd = open(rinfo->output, O_WRONLY|O_CREATE);
+		printf(stderr, "file open: fname=\"%s\", fd=%d\n", rinfo->output, fd);
+	}
+
+//	printf(stdout, "argv: %s, %s\n", argv[0], argv[1]);
 	exec(argv[0], argv);
-	printf(stdout, "\ncmd finished\n");
+//	printf(stdout, "\ncmd finished\n");
 }
 
 void exec_pipe(char *cmd, char *rcmd){
 	int fd[2];
 
+	printf(stderr, "exec pipe\n");
+
 	if(pipe(fd) < 0){
-		printf(stdout, "pipe error\n");
+		printf(stderr, "pipe error\n");
 		exit();
 	}
 	if(fork() == 0){
