@@ -21,7 +21,9 @@ typedef struct {
 } String;
 
 char* get_cmdline();
-void exec_cmd(char *buf);
+void run_cmdline(char *cmdline);
+void exec_cmd(char *cmd);
+void exec_pipe(char *cmd, char *rcmd);
 
 int main(int argc, char **argv){
 	while(true){
@@ -29,7 +31,7 @@ int main(int argc, char **argv){
 		char *cmdline = get_cmdline();
 		printf(stdout, "cmdline: %s\n", cmdline);
 
-		exec_cmd(cmdline);
+		run_cmdline(cmdline);
 	}
 
 	exit();
@@ -45,6 +47,31 @@ char* get_cmdline(){
 	return buf;
 }
 
+char* get_rightcmd(char **pcmdline){
+	char *cl = *pcmdline;
+	for(;*cl!='\0';cl++){
+		if(*cl == '|'){
+			*cl = '\0';
+			return cl+1;
+		}
+	}
+
+	return NULL;
+}
+
+void run_cmdline(char *cmdline){
+	char *rcmdline = get_rightcmd(&cmdline);
+	if(rcmdline != NULL){
+		printf(stdout, "rcmdline: %s\n", rcmdline);
+		exec_pipe(cmdline, rcmdline);
+		return;
+	}
+
+	if(fork() == 0)
+		exec_cmd(cmdline);
+	wait();
+}
+
 bool is_space(const char c){
 	switch(c){
 	case ' ':
@@ -54,17 +81,6 @@ bool is_space(const char c){
 	default:
 		return false;
 	}
-}
-
-bool is_delim(const char c){
-	if(is_space(c))
-		return true;
-	switch(c){
-	case '|':		// pipe
-		return true;
-	}
-
-	return false;
 }
 
 char* skip_space(char *p){
@@ -87,6 +103,7 @@ String* get_arg(char *cmd){
 			break;
 		end++;
 	}
+	*end = '\0';
 
 	if(cmd == end) return NULL;
 
@@ -121,14 +138,36 @@ char** parse_arg(char *cmd){
 }
 
 void exec_cmd(char *cmd){
-	int pid;
-	pid = fork(); // pid=0: child
-
-	if(pid == 0){
-		char** argv = parse_arg(cmd);
-		printf(stdout, "argv: %s, %s\n", argv[0], argv[1]);
-		exec(argv[0], argv);
-	}
-	wait();
+	char** argv = parse_arg(cmd);
+	printf(stdout, "argv: %s, %s\n", argv[0], argv[1]);
+	exec(argv[0], argv);
 	printf(stdout, "\ncmd finished\n");
+}
+
+void exec_pipe(char *cmd, char *rcmd){
+	int fd[2];
+
+	if(pipe(fd) < 0){
+		printf(stdout, "pipe error\n");
+		exit();
+	}
+	if(fork() == 0){
+		close(stdout);
+		dup(fd[1]);
+		close(fd[0]);
+		close(fd[1]);
+		exec_cmd(cmd);
+	}
+	if(fork() == 0){
+		close(stdin);
+		dup(fd[0]);
+		close(fd[0]);
+		close(fd[1]);
+		exec_cmd(rcmd);
+	}
+
+	close(fd[0]);
+	close(fd[1]);
+	wait();
+	wait();
 }
