@@ -1,4 +1,6 @@
 DEPTH = .
+UTIL=$(DEPTH)/util/
+
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
 

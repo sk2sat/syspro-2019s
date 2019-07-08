@@ -1,3 +1,5 @@
+include common.mk
+
 IMGS = fs.img xv6.img
 
 # If the makefile can't find QEMU, specify its path here
@@ -54,10 +56,11 @@ clean:
 	make -C app clean
 
 # files
-fs.img: mkfs README
+fs.img: README
 	make -C app
+	make -C util
 	cp app/_* .
-	./mkfs fs.img README _*
+	$(UTIL)mkfs fs.img README _*
 	rm -f _*
 
 xv6.img: kernel/xv6.img
@@ -65,6 +68,3 @@ xv6.img: kernel/xv6.img
 
 kernel/xv6.img:
 	make -C kernel
-
-mkfs: mkfs.c fs.h
-	gcc -Werror -Wall -o $@ $<
