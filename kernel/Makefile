@@ -1,4 +1,5 @@
 include ../common.mk
+DEPTH=..
 
 OBJS = \
 	bio.o\
@@ -126,7 +127,6 @@ clean:
 	*.o *.d *.asm *.sym vectors.S bootblock entryother \
 	initcode initcode.out kernel xv6.img fs.img kernelmemfs \
 	xv6memfs.img mkfs .gdbinit
-	make -C app clean
 
 # make a printout
 FILES = $(shell grep -v '^\#' runoff.list)

@@ -1,5 +1,5 @@
 # basic headers
-types.h
+../types.h
 param.h
 memlayout.h
 defs.h

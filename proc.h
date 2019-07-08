@@ -1,4 +1,4 @@
-#include "spinlock.h"
+#include "kernel/spinlock.h"
 
 // Per-CPU state
 struct cpu {
