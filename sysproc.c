@@ -7,6 +7,8 @@
 #include "mmu.h"
 #include "proc.h"
 
+extern struct ptable_t ptable;
+
 int
 sys_fork(void)
 {
@@ -88,4 +90,25 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int sys_getmaxproc(void){
+		return NPROC;
+}
+
+int sys_getptable(void){
+		struct proc *pt;
+		int nproc;
+
+		if(argint(1, &nproc) < 0 || argptr(0, (char**)&pt, nproc) < 0)
+				return -1;
+
+		acquire(&ptable.lock);
+		for(struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+				*pt = *p;
+				pt++;
+		}
+		release(&ptable.lock);
+
+		return 0;
 }

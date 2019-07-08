@@ -1,3 +1,8 @@
+#include "types.h"
+#include "param.h"
+#include "mmu.h"
+#include "proc.h"
+
 struct stat;
 struct rtcdate;
 
@@ -23,6 +28,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int getmaxproc(void);
+int getptable(struct proc *proc, int size);
 
 // ulib.c
 int stat(const char*, struct stat*);

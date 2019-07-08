@@ -5,12 +5,15 @@
 #include "mmu.h"
 #include "x86.h"
 #include "proc.h"
-#include "spinlock.h"
+//#include "spinlock.h"
 
+/*
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
 } ptable;
+*/
+struct ptable_t ptable;
 
 static struct proc *initproc;
 
@@ -149,6 +152,8 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
+
+  cprintf("proc name:%s\n", p->name);
 
   release(&ptable.lock);
 }
