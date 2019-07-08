@@ -33,6 +33,7 @@ void exec_pipe(char *cmd, char *rcmd);
 char *skip_space(char *p);
 
 int main(int argc, char **argv){
+	printf(stdout, "Welcome to sksat-sh, a tiny shell\n");
 	while(true){
 		printf(stdout, "> ");
 		char *cmdline = get_cmdline();
