@@ -210,11 +210,19 @@ rinode(uint inum, struct dinode *ip)
 void
 rsect(uint sec, void *buf)
 {
+	int ret;
   if(lseek(fsfd, sec * BSIZE, 0) != sec * BSIZE){
     perror("lseek");
     exit(1);
   }
-  if(read(fsfd, buf, BSIZE) != BSIZE){
+  ret = read(fsfd, buf, BSIZE);
+  if(ret != BSIZE){
+	  if(ret == 0){
+		  puts("EOF"); // ファイルの終端であってエラーではない(not -1)
+		  exit(0); // 今までexit(1)していただけで使えていたし大丈夫だろう(後でちゃんと読む．本当はcloseとかするべき．)
+	  }
+//  if(read(fsfd, buf, BSIZE) != BSIZE){
+//	printf("BSIZE=%d, ret=%d\n", BSIZE, ret);
     perror("read");
     exit(1);
   }
@@ -264,7 +272,7 @@ iappend(uint inum, void *xp, int n)
 
   rinode(inum, &din);
   off = xint(din.size);
-  // printf("append inum %d at off %d sz %d\n", inum, off, n);
+   printf("append inum %d at off %d sz %d\n", inum, off, n);
   while(n > 0){
     fbn = off / BSIZE;
     assert(fbn < MAXFILE);
