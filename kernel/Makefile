@@ -1,7 +1,7 @@
 include ../common.mk
 DEPTH=..
 
-OBJS = \
+OBJS = vga.o\
 	bio.o\
 	console.o\
 	exec.o\
@@ -30,7 +30,6 @@ OBJS = \
 	uart.o\
 	vectors.o\
 	vm.o
-#	vga.o
 
 # If the makefile can't find QEMU, specify its path here
 # QEMU = qemu-system-i386
