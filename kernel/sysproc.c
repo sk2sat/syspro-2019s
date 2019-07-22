@@ -118,3 +118,12 @@ int sys_setvga(void){
 	vga_setmode(VGA_320x200x256);
 	return 0;
 }
+
+int sys_draw_pixel(void){
+	int x, y, c;
+	if(argint(0, &x) < 0 || argint(1, &y) < 0 || argint(2, &c) < 0)
+		return -1;
+//	cprintf("x:%d y:%d c:%d\n", x, y, c);
+	draw_pixel(x, y, c);
+	return 0;
+}

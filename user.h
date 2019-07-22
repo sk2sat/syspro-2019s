@@ -31,6 +31,7 @@ int uptime(void);
 int getmaxproc(void);
 int getptable(struct proc *proc, int size);
 int setvga();
+int draw_pixel(int x, int y, int c);
 
 // ulib.c
 int stat(const char*, struct stat*);

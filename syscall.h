@@ -23,3 +23,4 @@
 #define SYS_getmaxproc	22
 #define SYS_getptable	23
 #define SYS_setvga		24
+#define SYS_draw_pixel	25
