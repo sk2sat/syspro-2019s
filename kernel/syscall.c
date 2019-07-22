@@ -105,6 +105,7 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_getmaxproc(void);
 extern int sys_getptable(void);
+extern int sys_setvga(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]			sys_fork,
@@ -130,6 +131,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]			sys_close,
 [SYS_getmaxproc]	sys_getmaxproc,
 [SYS_getptable]		sys_getptable,
+[SYS_setvga]		sys_setvga,
 };
 
 void

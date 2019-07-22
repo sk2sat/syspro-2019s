@@ -22,3 +22,4 @@
 #define SYS_close		21
 #define SYS_getmaxproc	22
 #define SYS_getptable	23
+#define SYS_setvga		24

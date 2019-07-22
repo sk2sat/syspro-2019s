@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "vga.h"
 
 extern struct ptable_t ptable;
 
@@ -111,4 +112,9 @@ int sys_getptable(void){
 		release(&ptable.lock);
 
 		return 0;
+}
+
+int sys_setvga(void){
+	vga_setmode(VGA_320x200x256);
+	return 0;
 }

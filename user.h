@@ -30,6 +30,7 @@ int sleep(int);
 int uptime(void);
 int getmaxproc(void);
 int getptable(struct proc *proc, int size);
+int setvga();
 
 // ulib.c
 int stat(const char*, struct stat*);
