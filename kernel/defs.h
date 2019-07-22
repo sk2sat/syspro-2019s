@@ -10,6 +10,9 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+// vga.c
+void 			demo_graphics(void);
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);

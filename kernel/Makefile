@@ -29,7 +29,8 @@ OBJS = \
 	trap.o\
 	uart.o\
 	vectors.o\
-	vm.o\
+	vm.o
+#	vga.o
 
 # If the makefile can't find QEMU, specify its path here
 # QEMU = qemu-system-i386
